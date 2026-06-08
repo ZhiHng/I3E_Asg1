@@ -1,3 +1,9 @@
+/*
+* Author: Zhi Hng
+* Date: 8 June 2026
+* Description: Plays animation
+*/
+
 using System; // Import standard .NET system types (not strictly needed here but common in C# files)
 using UnityEngine; // Import Unity-specific classes like MonoBehaviour, GameObject, Collider, and print
 

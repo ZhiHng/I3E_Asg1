@@ -1,3 +1,9 @@
+/*
+* Author: Zhi Hng
+* Date: 8 June 2026
+* Description: Handles interactions of collectibles, doors
+*/
+
 using System; // Import standard .NET system types (not strictly needed here but common in C# files)
 using UnityEngine; // Import Unity-specific classes like MonoBehaviour, GameObject, Collider, and print
 using TMPro;
@@ -14,17 +20,22 @@ public class PlayerScript : MonoBehaviour
     [SerializeField]
     LayerMask highlightable;
 
-    int playerScore = 0; // Keep track of how many points the player has collected so far
+    int documentCount = 0; // Keep track of how many documents the player has collected so far
+    float hitpoints = 100f;
+    float damageTimer = 0f; //Determines the time interval between damage ticks
+    bool isBurn = false;
+    float burnTimer = 0;
     int keycardClearance = 1;
     [SerializeField]
     int targetScore = 0; // The goal score required to complete a task, editable from the Unity Inspector
 
     [SerializeField]
-    TextMeshProUGUI scoreText; // Reference to the UI text element that displays the player's score
+    TextMeshProUGUI documentText, hitpointsText; // Reference to the UI text element that displays the player's score
 
     void Start()
     {
-        scoreText.text = "Score: " + playerScore; // Initialize the score display to show the starting score of 0 when the game begins
+        documentText.text = "Documents: " + documentCount;
+        hitpointsText.text = "HP: " + hitpoints; // Initialize the score display to show the starting score of 0 when the game begins
     }
     void Update()
     {
@@ -47,6 +58,22 @@ public class PlayerScript : MonoBehaviour
             if (currentHighlighted != null) {
                 currentHighlighted.GetComponent<Renderer>().material = originalMaterial;
                 currentHighlighted = null;
+            }
+        }
+        
+        if (isBurn)
+        {
+            if (damageTimer > 1)
+            {
+                hitpoints -= 15;
+                burnTimer--;
+                damageTimer = 0;
+                hitpointsText.text = "HP: " + hitpoints;
+            }
+            damageTimer += Time.deltaTime;
+            if (burnTimer <= 0)
+            {
+                isBurn = false;
             }
         }
     }
@@ -75,8 +102,8 @@ public class PlayerScript : MonoBehaviour
                 keycardClearance++;
                 print("Clearance up");
             }
-            playerScore += currentCollectible.collectibleScore; // Add the collectible's score value to the player's total score
-            scoreText.text = "Score: " + playerScore; // Update the on-screen score display to reflect the new score after collecting an item
+            documentCount += currentCollectible.collectibleScore; // Add the collectible's score value to the player's total score
+            documentText.text = "Documents: " + documentCount; // Update the on-screen score display to reflect the new score after collecting an item
             currentCollectible.Collect(); // Call the Collect method on the collectible script to handle its collection logic
             currentCollectible = null; // Clear the reference so the player no longer has an active collectible selected 
         }
@@ -92,35 +119,59 @@ public class PlayerScript : MonoBehaviour
         }
     }
 
-    void OnTriggerEnter(Collider other) // Unity event called when another collider enters this GameObject's trigger collider
+    void OnTriggerEnter(Collider other)
     {
-        if(other.gameObject.tag == "Collectible") // Check if the object entering the trigger is tagged as a collectible
+        print("test");
+        if(other.gameObject.tag == "Hazards") // Check if the object entering the trigger is tagged as a hazard
         {
-            currentCollectible = other.GetComponentInParent<CollectibleScript>(); // Store the collectible script so the player can interact with it later
-        }
-
-        if(other.gameObject.tag == "Door") // Check if the object entering the trigger is tagged as a door
-        {
-            currentDoor = other.GetComponentInParent<DoorScript>(); // Get the DoorScript component from the parent of the collider
-        }
-
-        if(other.gameObject.tag == "GoalArea" && playerScore >= targetScore) // Check if the player entered the goal area and has enough points
-        {
-            print("Player entered trigger zone with " + playerScore + " points"); // Print a success message when the player reaches the goal with enough score
+            print("entered");
+            damageTimer = 0f;
+            if (other.gameObject.name.Contains("Green"))
+            {
+                hitpoints -= 5;
+            }
+            else if (other.gameObject.name.Contains("Red"))
+            {
+                isBurn = false;
+                hitpoints -= 15;
+            }
+            hitpointsText.text = "HP: " + hitpoints;
         }
     }
-
-    void OnTriggerExit(Collider other) // Unity event called when another collider leaves this GameObject's trigger collider
+    void OnTriggerStay(Collider other) // Unity event called when another collider enters this GameObject's trigger collider
     {
-        if(other.gameObject.GetComponentInParent<CollectibleScript>() == currentCollectible) // If the collectible leaving the trigger is the one we were tracking
+        if(other.gameObject.tag == "Hazards") // Check if the object entering the trigger is tagged as a hazard
         {
-            currentCollectible = null; // Clear the current collectible because it is no longer in range
-        }
-
-        if(other.gameObject.GetComponentInParent<DoorScript>() == currentDoor) // If the door leaving the trigger is the one we were tracking
-        {
-            currentDoor = null; // Clear the current door because it is no longer in range
+            if (other.gameObject.name.Contains("Green"))
+            {
+                if (damageTimer > 0.1)
+                {
+                    hitpoints -= 5;
+                    damageTimer = 0;
+                    hitpointsText.text = "HP: " + hitpoints;
+                }
+            } 
+            else if (other.gameObject.name.Contains("Red"))
+            {
+                if (damageTimer > 1)
+                {
+                    hitpoints -= 15;
+                    damageTimer = 0;
+                    hitpointsText.text = "HP: " + hitpoints;
+                }
+            } 
+            damageTimer += Time.deltaTime;
         }
     }
-
+    void OnTriggerExit(Collider other)
+    {
+        if(other.gameObject.tag == "Hazards") // Check if the object entering the trigger is tagged as a hazard
+        {
+            if (other.gameObject.name.Contains("Red"))
+            {
+                isBurn = true;
+                burnTimer = 3;
+            } 
+        }
+    }
 }

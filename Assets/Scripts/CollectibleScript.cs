@@ -1,3 +1,9 @@
+/*
+* Author: Zhi hng
+* Date: 8 June 2026
+* Description: Plays collect audio and deletes collectible
+*/
+
 using UnityEngine;
 
 public class CollectibleScript : MonoBehaviour
