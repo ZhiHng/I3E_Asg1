@@ -11,7 +11,9 @@ GameObject:
   - component: {fileID: 9084555570784561361}
   - component: {fileID: 2465085851589830227}
   - component: {fileID: 1493349490345291093}
-  m_Layer: 0
+  - component: {fileID: 3954921455969076813}
+  - component: {fileID: 797076788110469530}
+  m_Layer: 3
   m_Name: keycard
   m_TagString: Collectible
   m_Icon: {fileID: 0}
@@ -90,3 +92,38 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &3954921455969076813
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8044239141587293549}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c94237f780502e4daaef3872d5c136e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CollectibleScript
+  collectibleScore: 0
+  collectibleAudioClip: {fileID: 8300000, guid: 414ceacedcba5354296817d2baf935a5, type: 3}
+--- !u!65 &797076788110469530
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8044239141587293549}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 100, y: 100.00098, z: 99.99996}
+  m_Center: {x: 0.00018310547, y: -0.00048828125, z: -0.000106811516}

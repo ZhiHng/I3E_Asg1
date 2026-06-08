@@ -15,7 +15,7 @@ public class PlayerScript : MonoBehaviour
     LayerMask highlightable;
 
     int playerScore = 0; // Keep track of how many points the player has collected so far
-
+    int keycardClearance = 1;
     [SerializeField]
     int targetScore = 0; // The goal score required to complete a task, editable from the Unity Inspector
 
@@ -52,14 +52,29 @@ public class PlayerScript : MonoBehaviour
     }
     void OnInteract() // Custom interaction method called when the player performs an interact action
     {
-        if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out RaycastHit hit, 10f)) {
-            if(hit.collider.gameObject.tag == "DoorButton") // Check if the object entering the trigger is tagged as a door
+        if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out RaycastHit hit, 1.5f)) {
+            if(hit.collider.gameObject.CompareTag("DoorButton")) // Check if the object entering the trigger is tagged as a door
             {
                 currentDoor = hit.collider.gameObject.GetComponentInParent<DoorScript>(); // Get the DoorScript component from the parent of the collider
+                if ((currentDoor.gameObject.name.Contains("Lvl2") && keycardClearance < 2) || (currentDoor.gameObject.name.Contains("Lvl3") && keycardClearance < 3)) //Checks level for clearance for door
+                {
+                    currentDoor = null;
+                    print("Not enough clearance for access");
+                }
+            }
+            print("test");
+            if (hit.collider.gameObject.CompareTag("Collectible"))
+            {
+                currentCollectible = hit.collider.gameObject.GetComponentInParent<CollectibleScript>();
             }
         }
         if(currentCollectible != null) // Only collect something if the player is currently near a collectible
         {
+            if (currentCollectible.gameObject.name.Contains("keycard"))
+            {
+                keycardClearance++;
+                print("Clearance up");
+            }
             playerScore += currentCollectible.collectibleScore; // Add the collectible's score value to the player's total score
             scoreText.text = "Score: " + playerScore; // Update the on-screen score display to reflect the new score after collecting an item
             currentCollectible.Collect(); // Call the Collect method on the collectible script to handle its collection logic
