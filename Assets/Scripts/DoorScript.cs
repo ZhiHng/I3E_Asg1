@@ -1,6 +1,6 @@
 /*
 * Author: Zhi Hng
-* Date: 8 June 2026
+* Date: 9 June 2026
 * Description: Plays animation
 */
 
@@ -9,25 +9,50 @@ using UnityEngine; // Import Unity-specific classes like MonoBehaviour, GameObje
 
 public class DoorScript : MonoBehaviour
 {
-    Animator myAnimator;
+    Animator doorAnimator, batteryAnimator;
+    [SerializeField]
+    GameObject player;
+    public int batteries;
 
     bool isOpen = false;
 
     void Start()
     {
-        myAnimator = GetComponentInChildren<Animator>();
+        doorAnimator = transform.Find("doorSlide").gameObject.GetComponent<Animator>();
+        batteryAnimator = transform.Find("powerUnitGroup").gameObject.GetComponent<Animator>();
+        batteryAnimator.SetInteger("batteries", batteries);
+    }
+
+    void Update()
+    {
+        if (Vector3.Distance(player.transform.position, transform.position) > 3f)
+        {
+            if(isOpen)
+            {
+                doorAnimator.SetTrigger("doorClose");
+                isOpen = !isOpen;
+                print("close");
+            }
+        }
     }
 
     public void Interact()
     {
         if(isOpen)
         {
-            myAnimator.SetTrigger("doorClose");
+            doorAnimator.SetTrigger("doorClose");
         }
         else
         {
-            myAnimator.SetTrigger("doorOpen");
+            doorAnimator.SetTrigger("doorOpen");
         }
         isOpen = !isOpen;
+    }
+
+    public void AddBattery(int numberOfBattery)
+    {
+        print("adding battery");
+        batteries += numberOfBattery;
+        batteryAnimator.SetInteger("batteries", batteries);
     }
 }

@@ -8,6 +8,7 @@ TagManager:
   - DoorButton
   - Collectible
   - Hazards
+  - PowerUnit
   layers:
   - Default
   - TransparentFX

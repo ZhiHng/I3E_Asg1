@@ -1,6 +1,6 @@
 /*
 * Author: Zhi Hng
-* Date: 8 June 2026
+* Date: 9 June 2026
 * Description: Handles interactions of collectibles, doors
 */
 
@@ -10,6 +10,7 @@ using TMPro;
 
 public class PlayerScript : MonoBehaviour
 {
+    [SerializeField]
     CollectibleScript currentCollectible; // Store the collectible object the player is currently able to interact with
     DoorScript currentDoor;
 
@@ -21,6 +22,7 @@ public class PlayerScript : MonoBehaviour
     LayerMask highlightable;
 
     int documentCount = 0; // Keep track of how many documents the player has collected so far
+    int batteryCount = 0;
     float hitpoints = 100f;
     float damageTimer = 0f; //Determines the time interval between damage ticks
     bool isBurn = false;
@@ -30,12 +32,13 @@ public class PlayerScript : MonoBehaviour
     int targetScore = 0; // The goal score required to complete a task, editable from the Unity Inspector
 
     [SerializeField]
-    TextMeshProUGUI documentText, hitpointsText; // Reference to the UI text element that displays the player's score
+    TextMeshProUGUI documentText, hitpointsText, batteryText; // Reference to the UI text element that displays the player's score
 
     void Start()
     {
         documentText.text = "Documents: " + documentCount;
         hitpointsText.text = "HP: " + hitpoints; // Initialize the score display to show the starting score of 0 when the game begins
+        batteryText.text = "Batteries: " + batteryCount;
     }
     void Update()
     {
@@ -79,7 +82,7 @@ public class PlayerScript : MonoBehaviour
     }
     void OnInteract() // Custom interaction method called when the player performs an interact action
     {
-        if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out RaycastHit hit, 1.5f)) {
+        if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out RaycastHit hit, 1.5f, highlightable)) {
             if(hit.collider.gameObject.CompareTag("DoorButton")) // Check if the object entering the trigger is tagged as a door
             {
                 currentDoor = hit.collider.gameObject.GetComponentInParent<DoorScript>(); // Get the DoorScript component from the parent of the collider
@@ -88,11 +91,37 @@ public class PlayerScript : MonoBehaviour
                     currentDoor = null;
                     print("Not enough clearance for access");
                 }
+                if (currentDoor.gameObject.name.Contains("Battery") && currentDoor.batteries != 4) //Checks level for clearance for door
+                {
+                    currentDoor = null;
+                    print("Not enough batteries to power the door");
+                }
             }
-            print("test");
+            if(hit.collider.gameObject.CompareTag("PowerUnit")) 
+            {
+                currentDoor = hit.collider.gameObject.GetComponentInParent<DoorScript>(); // Get the DoorScript component from the parent of the collider
+                if (currentDoor.batteries != 4 && batteryCount != 0)
+                {
+                    int addedBattery;
+                    if (4 - currentDoor.batteries < batteryCount)
+                    {
+                        addedBattery = 4 - currentDoor.batteries;
+                    }
+                    else
+                    {
+                        addedBattery = batteryCount;
+                    }
+                    batteryCount = 0;
+                    currentDoor.AddBattery(addedBattery);
+                    
+                    batteryText.text = "Batteries: " + batteryCount;
+                }
+                currentDoor = null;
+            }
             if (hit.collider.gameObject.CompareTag("Collectible"))
             {
                 currentCollectible = hit.collider.gameObject.GetComponentInParent<CollectibleScript>();
+                print(currentCollectible.gameObject.name);
             }
         }
         if(currentCollectible != null) // Only collect something if the player is currently near a collectible
@@ -102,8 +131,20 @@ public class PlayerScript : MonoBehaviour
                 keycardClearance++;
                 print("Clearance up");
             }
+            else if (currentCollectible.gameObject.name.Contains("medkit"))
+            {
+                hitpoints += 20;
+                print("healed");
+            }
+            else if (currentCollectible.gameObject.name.Contains("battery"))
+            {
+                batteryCount++;
+                print("battery Up");
+            }
             documentCount += currentCollectible.collectibleScore; // Add the collectible's score value to the player's total score
             documentText.text = "Documents: " + documentCount; // Update the on-screen score display to reflect the new score after collecting an item
+            hitpointsText.text = "HP: " + hitpoints;
+            batteryText.text = "Batteries: " + batteryCount;
             currentCollectible.Collect(); // Call the Collect method on the collectible script to handle its collection logic
             currentCollectible = null; // Clear the reference so the player no longer has an active collectible selected 
         }
@@ -113,9 +154,10 @@ public class PlayerScript : MonoBehaviour
             //return; // Exit the method early because we cannot safely collect the item without the script
         }
 
-        if(currentDoor != null) // Check if the player is currently near a door they can interact with
+        if (currentDoor != null) // Check if the player is currently near a door they can interact with
         {
             currentDoor.Interact(); // Call the Interact method on the door script to toggle its open/closed state
+            currentDoor = null;
         }
     }
 
