@@ -9,6 +9,7 @@ TagManager:
   - Collectible
   - Hazards
   - PowerUnit
+  - Smoke
   layers:
   - Default
   - TransparentFX

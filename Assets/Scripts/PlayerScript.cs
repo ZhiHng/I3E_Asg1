@@ -7,6 +7,8 @@
 using System; // Import standard .NET system types (not strictly needed here but common in C# files)
 using UnityEngine; // Import Unity-specific classes like MonoBehaviour, GameObject, Collider, and print
 using TMPro;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 public class PlayerScript : MonoBehaviour
 {
@@ -20,6 +22,9 @@ public class PlayerScript : MonoBehaviour
     Material highlightMaterial;
     [SerializeField]
     LayerMask highlightable;
+    [SerializeField]
+    Volume globalVolume;
+    Vignette vignette;
 
     int documentCount = 0; // Keep track of how many documents the player has collected so far
     int batteryCount = 0;
@@ -40,6 +45,9 @@ public class PlayerScript : MonoBehaviour
         hitpointsText.text = "HP: " + hitpoints; // Initialize the score display to show the starting score of 0 when the game begins
         batteryText.text = "Batteries: " + batteryCount;
         controller = GetComponent<CharacterController>();
+        globalVolume.profile.TryGet<Vignette>(out vignette);
+        vignette.intensity.value = 0.2f;
+        vignette.smoothness.overrideState = false;
     }
     void Update()
     {
@@ -164,7 +172,7 @@ public class PlayerScript : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if(other.gameObject.tag == "Hazards") // Check if the object entering the trigger is tagged as a hazard
+        if (other.gameObject.tag == "Hazards") // Check if the object entering the trigger is tagged as a hazard
         {
             damageTimer = 0f;
             if (other.gameObject.name.Contains("Green"))
@@ -178,6 +186,11 @@ public class PlayerScript : MonoBehaviour
             }
             hitpointsText.text = "HP: " + hitpoints;
         }
+        if (other.gameObject.tag == "Smoke")
+        {
+            vignette.intensity.value = 1f;
+            vignette.smoothness.overrideState = true;
+        }
     }
     void OnTriggerStay(Collider other) // Unity event called when another collider enters this GameObject's trigger collider
     {
@@ -185,7 +198,7 @@ public class PlayerScript : MonoBehaviour
         {
             if (other.gameObject.name.Contains("laserBeam"))
             {
-                hitpoints -= 1;
+                hitpoints -= 2;
                 Vector3 dir = (transform.position - other.ClosestPoint(transform.position)).normalized;
 
                 // Apply a quick knockback move
@@ -221,6 +234,11 @@ public class PlayerScript : MonoBehaviour
                 isBurn = true;
                 burnTimer = 3;
             } 
+        }
+        if (other.gameObject.tag == "Smoke")
+        {
+            vignette.intensity.value = 0.2f;
+            vignette.smoothness.overrideState = false;
         }
     }
 }
