@@ -33,12 +33,13 @@ public class PlayerScript : MonoBehaviour
 
     [SerializeField]
     TextMeshProUGUI documentText, hitpointsText, batteryText; // Reference to the UI text element that displays the player's score
-
+    CharacterController controller;
     void Start()
     {
         documentText.text = "Documents: " + documentCount;
         hitpointsText.text = "HP: " + hitpoints; // Initialize the score display to show the starting score of 0 when the game begins
         batteryText.text = "Batteries: " + batteryCount;
+        controller = GetComponent<CharacterController>();
     }
     void Update()
     {
@@ -163,10 +164,8 @@ public class PlayerScript : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        print("test");
         if(other.gameObject.tag == "Hazards") // Check if the object entering the trigger is tagged as a hazard
         {
-            print("entered");
             damageTimer = 0f;
             if (other.gameObject.name.Contains("Green"))
             {
@@ -184,13 +183,21 @@ public class PlayerScript : MonoBehaviour
     {
         if(other.gameObject.tag == "Hazards") // Check if the object entering the trigger is tagged as a hazard
         {
+            if (other.gameObject.name.Contains("laserBeam"))
+            {
+                hitpoints -= 1;
+                Vector3 dir = (transform.position - other.ClosestPoint(transform.position)).normalized;
+
+                // Apply a quick knockback move
+                controller.Move(dir * 15f * Time.deltaTime);
+                print("lazer");
+            }
             if (other.gameObject.name.Contains("Green"))
             {
                 if (damageTimer > 0.1)
                 {
                     hitpoints -= 5;
                     damageTimer = 0;
-                    hitpointsText.text = "HP: " + hitpoints;
                 }
             } 
             else if (other.gameObject.name.Contains("Red"))
@@ -199,9 +206,9 @@ public class PlayerScript : MonoBehaviour
                 {
                     hitpoints -= 15;
                     damageTimer = 0;
-                    hitpointsText.text = "HP: " + hitpoints;
                 }
             } 
+            hitpointsText.text = "HP: " + hitpoints;
             damageTimer += Time.deltaTime;
         }
     }
