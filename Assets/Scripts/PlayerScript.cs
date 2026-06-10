@@ -1,6 +1,6 @@
 /*
 * Author: Zhi Hng
-* Date: 9 June 2026
+* Date: 10 June 2026
 * Description: Handles interactions of collectibles, doors
 */
 
@@ -9,6 +9,7 @@ using UnityEngine; // Import Unity-specific classes like MonoBehaviour, GameObje
 using TMPro;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+using Unity.VisualScripting;
 
 public class PlayerScript : MonoBehaviour
 {
@@ -27,11 +28,14 @@ public class PlayerScript : MonoBehaviour
     Vignette vignette;
 
     int documentCount = 0; // Keep track of how many documents the player has collected so far
+    [SerializeField]
     int batteryCount = 0;
+    [SerializeField]
     float hitpoints = 100f;
     float damageTimer = 0f; //Determines the time interval between damage ticks
     bool isBurn = false;
     float burnTimer = 0;
+    [SerializeField]
     int keycardClearance = 1;
     [SerializeField]
     int targetScore = 0; // The goal score required to complete a task, editable from the Unity Inspector
@@ -95,7 +99,7 @@ public class PlayerScript : MonoBehaviour
             if(hit.collider.gameObject.CompareTag("DoorButton")) // Check if the object entering the trigger is tagged as a door
             {
                 currentDoor = hit.collider.gameObject.GetComponentInParent<DoorScript>(); // Get the DoorScript component from the parent of the collider
-                if ((currentDoor.gameObject.name.Contains("Lvl2") && keycardClearance < 2) || (currentDoor.gameObject.name.Contains("Lvl3") && keycardClearance < 3)) //Checks level for clearance for door
+                if ((currentDoor.gameObject.name.Contains("Lvl2") && keycardClearance < 2) || (currentDoor.gameObject.name.Contains("Lvl3") && keycardClearance < 3) || (currentDoor.gameObject.name.Contains("Lvl4") && keycardClearance < 4)) //Checks level for clearance for door
                 {
                     currentDoor = null;
                     print("Not enough clearance for access");
@@ -142,7 +146,13 @@ public class PlayerScript : MonoBehaviour
             }
             else if (currentCollectible.gameObject.name.Contains("medkit"))
             {
+                if (hitpoints >= 100)
+                {
+                    print("full hp");
+                    return;
+                }
                 hitpoints += 20;
+                hitpoints = Math.Min(100, hitpoints);
                 print("healed");
             }
             else if (currentCollectible.gameObject.name.Contains("battery"))

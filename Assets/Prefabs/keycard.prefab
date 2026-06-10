@@ -105,6 +105,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CollectibleScript
   collectibleScore: 0
+  volume: 1
   collectibleAudioClip: {fileID: 8300000, guid: 414ceacedcba5354296817d2baf935a5, type: 3}
 --- !u!65 &797076788110469530
 BoxCollider:

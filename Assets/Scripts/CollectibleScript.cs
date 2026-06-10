@@ -1,6 +1,6 @@
 /*
 * Author: Zhi hng
-* Date: 9 June 2026
+* Date: 10 June 2026
 * Description: Plays collect audio and deletes collectible
 */
 
@@ -9,7 +9,8 @@ using UnityEngine;
 public class CollectibleScript : MonoBehaviour
 {
     public int collectibleScore = 0; // Store the score value of this collectible, editable from the Unity Inspector. (this allows different collectibles to be worth different amounts of points)
-
+    [SerializeField]
+    float volume;
     [SerializeField]
     AudioClip collectibleAudioClip;
 
@@ -21,9 +22,10 @@ public class CollectibleScript : MonoBehaviour
         // }
         // SOLUTION 1
         //Destroy(gameObject, collectibleAudio.clip.length); // Destroy this GameObject after the sound has finished playing to remove it from the scene
-    
+
+        
         // SOLUTION 2
-        AudioSource.PlayClipAtPoint(collectibleAudioClip, transform.position);
+        AudioSource.PlayClipAtPoint(collectibleAudioClip, transform.position, volume);
         Destroy(gameObject); // Immediately destroy this GameObject to remove it from the scene, allowing the sound to play independently
     }
 }
