@@ -41,13 +41,12 @@ public class PlayerScript : MonoBehaviour
     int targetScore = 0; // The goal score required to complete a task, editable from the Unity Inspector
 
     [SerializeField]
-    TextMeshProUGUI documentText, hitpointsText, batteryText; // Reference to the UI text element that displays the player's score
+    TextMeshProUGUI collectibleText, hitpointsText; // Reference to the UI text element that displays the player's score
     CharacterController controller;
     void Start()
     {
-        documentText.text = "Documents: " + documentCount;
+        collectibleText.text = "Documents: " + documentCount + "\n" + "Batteries: " + batteryCount;
         hitpointsText.text = "HP: " + hitpoints; // Initialize the score display to show the starting score of 0 when the game begins
-        batteryText.text = "Batteries: " + batteryCount;
         controller = GetComponent<CharacterController>();
         globalVolume.profile.TryGet<Vignette>(out vignette);
         vignette.intensity.value = 0.2f;
@@ -124,10 +123,10 @@ public class PlayerScript : MonoBehaviour
                     {
                         addedBattery = batteryCount;
                     }
-                    batteryCount = 0;
+                    batteryCount = batteryCount - addedBattery;
                     currentDoor.AddBattery(addedBattery);
                     
-                    batteryText.text = "Batteries: " + batteryCount;
+                    collectibleText.text = "Documents: " + documentCount + "\n" + "Batteries: " + batteryCount;
                 }
                 currentDoor = null;
             }
@@ -161,9 +160,8 @@ public class PlayerScript : MonoBehaviour
                 print("battery Up");
             }
             documentCount += currentCollectible.collectibleScore; // Add the collectible's score value to the player's total score
-            documentText.text = "Documents: " + documentCount; // Update the on-screen score display to reflect the new score after collecting an item
+            collectibleText.text = "Documents: " + documentCount + "\n" + "Batteries: " + batteryCount; // Update the on-screen score display to reflect the new score after collecting an item
             hitpointsText.text = "HP: " + hitpoints;
-            batteryText.text = "Batteries: " + batteryCount;
             currentCollectible.Collect(); // Call the Collect method on the collectible script to handle its collection logic
             currentCollectible = null; // Clear the reference so the player no longer has an active collectible selected 
         }
