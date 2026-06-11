@@ -2190,6 +2190,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c2979ee83cca29458f9a1b3c10b98c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DoorScript
+  doorAudio: {fileID: 8300000, guid: 7751be1ddec85a4419334dc3d8489a0b, type: 3}
   player: {fileID: 0}
   batteries: 0
 --- !u!1 &5884050618575871453

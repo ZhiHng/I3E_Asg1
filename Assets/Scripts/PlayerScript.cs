@@ -1,6 +1,6 @@
 /*
 * Author: Zhi Hng
-* Date: 10 June 2026
+* Date: 11 June 2026
 * Description: Handles interactions of collectibles, doors
 */
 
@@ -9,14 +9,14 @@ using UnityEngine; // Import Unity-specific classes like MonoBehaviour, GameObje
 using TMPro;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
-using Unity.VisualScripting;
+using System.Collections;
 
 public class PlayerScript : MonoBehaviour
 {
     [SerializeField]
+    InformationUIScript informationUI;
     CollectibleScript currentCollectible; // Store the collectible object the player is currently able to interact with
     DoorScript currentDoor;
-
     GameObject currentHighlighted;
     Material originalMaterial;
     [SerializeField]
@@ -26,8 +26,12 @@ public class PlayerScript : MonoBehaviour
     [SerializeField]
     Volume globalVolume;
     Vignette vignette;
+    ColorAdjustments colorAdjustments;
+    [SerializeField]
+    AudioClip damageSound;
 
     int documentCount = 0; // Keep track of how many documents the player has collected so far
+    int totalDocument;
     [SerializeField]
     int batteryCount = 0;
     [SerializeField]
@@ -38,19 +42,27 @@ public class PlayerScript : MonoBehaviour
     [SerializeField]
     int keycardClearance = 1;
     [SerializeField]
-    int targetScore = 0; // The goal score required to complete a task, editable from the Unity Inspector
-
-    [SerializeField]
     TextMeshProUGUI collectibleText, hitpointsText; // Reference to the UI text element that displays the player's score
     CharacterController controller;
+    
     void Start()
     {
-        collectibleText.text = "Documents: " + documentCount + "\n" + "Batteries: " + batteryCount;
         hitpointsText.text = "HP: " + hitpoints; // Initialize the score display to show the starting score of 0 when the game begins
         controller = GetComponent<CharacterController>();
         globalVolume.profile.TryGet<Vignette>(out vignette);
+        globalVolume.profile.TryGet<ColorAdjustments>(out colorAdjustments);
         vignette.intensity.value = 0.2f;
         vignette.smoothness.overrideState = false;
+        colorAdjustments.active = false;
+        GameObject[] collectibles = GameObject.FindGameObjectsWithTag("Collectible");
+        foreach (GameObject item in collectibles)
+        {
+            if (item.name.Contains("folder"))
+            {
+                totalDocument++;
+            }
+        }
+        collectibleText.text = "Documents: " + documentCount + " / " + totalDocument + "\nBatteries: " + batteryCount;
     }
     void Update()
     {
@@ -84,6 +96,7 @@ public class PlayerScript : MonoBehaviour
                 burnTimer--;
                 damageTimer = 0;
                 hitpointsText.text = "HP: " + hitpoints;
+                PlayerDamaged();
             }
             damageTimer += Time.deltaTime;
             if (burnTimer <= 0)
@@ -101,12 +114,12 @@ public class PlayerScript : MonoBehaviour
                 if ((currentDoor.gameObject.name.Contains("Lvl2") && keycardClearance < 2) || (currentDoor.gameObject.name.Contains("Lvl3") && keycardClearance < 3) || (currentDoor.gameObject.name.Contains("Lvl4") && keycardClearance < 4)) //Checks level for clearance for door
                 {
                     currentDoor = null;
-                    print("Not enough clearance for access");
+                    informationUI.BroadcastMessage("Not enough clearance for access");
                 }
                 if (currentDoor.gameObject.name.Contains("Battery") && currentDoor.batteries != 4) //Checks level for clearance for door
                 {
                     currentDoor = null;
-                    print("Not enough batteries to power the door");
+                    informationUI.BroadcastMessage("Not enough batteries to power the door");
                 }
             }
             if(hit.collider.gameObject.CompareTag("PowerUnit")) 
@@ -126,14 +139,13 @@ public class PlayerScript : MonoBehaviour
                     batteryCount = batteryCount - addedBattery;
                     currentDoor.AddBattery(addedBattery);
                     
-                    collectibleText.text = "Documents: " + documentCount + "\n" + "Batteries: " + batteryCount;
+                    collectibleText.text = "Documents: " + documentCount + " / " + totalDocument + "\nBatteries: " + batteryCount;
                 }
                 currentDoor = null;
             }
             if (hit.collider.gameObject.CompareTag("Collectible"))
             {
                 currentCollectible = hit.collider.gameObject.GetComponentInParent<CollectibleScript>();
-                print(currentCollectible.gameObject.name);
             }
         }
         if(currentCollectible != null) // Only collect something if the player is currently near a collectible
@@ -141,26 +153,24 @@ public class PlayerScript : MonoBehaviour
             if (currentCollectible.gameObject.name.Contains("keycard"))
             {
                 keycardClearance++;
-                print("Clearance up");
+                informationUI.BroadcastMessage("Clearance up");
             }
             else if (currentCollectible.gameObject.name.Contains("medkit"))
             {
                 if (hitpoints >= 100)
                 {
-                    print("full hp");
+                    informationUI.BroadcastMessage("Max HP");
+                    currentCollectible = null;
                     return;
                 }
                 hitpoints += 20;
                 hitpoints = Math.Min(100, hitpoints);
-                print("healed");
             }
             else if (currentCollectible.gameObject.name.Contains("battery"))
             {
                 batteryCount++;
-                print("battery Up");
             }
-            documentCount += currentCollectible.collectibleScore; // Add the collectible's score value to the player's total score
-            collectibleText.text = "Documents: " + documentCount + "\n" + "Batteries: " + batteryCount; // Update the on-screen score display to reflect the new score after collecting an item
+            collectibleText.text = "Documents: " + documentCount + " / " + totalDocument + "\nBatteries: " + batteryCount; // Update the on-screen score display to reflect the new score after collecting an item
             hitpointsText.text = "HP: " + hitpoints;
             currentCollectible.Collect(); // Call the Collect method on the collectible script to handle its collection logic
             currentCollectible = null; // Clear the reference so the player no longer has an active collectible selected 
@@ -192,6 +202,7 @@ public class PlayerScript : MonoBehaviour
                 isBurn = false;
                 hitpoints -= 15;
             }
+            PlayerDamaged();
             hitpointsText.text = "HP: " + hitpoints;
         }
         if (other.gameObject.tag == "Smoke")
@@ -211,7 +222,7 @@ public class PlayerScript : MonoBehaviour
 
                 // Apply a quick knockback move
                 controller.Move(dir * 15f * Time.deltaTime);
-                print("lazer");
+                PlayerDamaged();
             }
             if (other.gameObject.name.Contains("Green"))
             {
@@ -219,6 +230,7 @@ public class PlayerScript : MonoBehaviour
                 {
                     hitpoints -= 5;
                     damageTimer = 0;
+                    PlayerDamaged();
                 }
             } 
             else if (other.gameObject.name.Contains("Red"))
@@ -227,6 +239,7 @@ public class PlayerScript : MonoBehaviour
                 {
                     hitpoints -= 15;
                     damageTimer = 0;
+                    PlayerDamaged();
                 }
             } 
             hitpointsText.text = "HP: " + hitpoints;
@@ -249,4 +262,16 @@ public class PlayerScript : MonoBehaviour
             vignette.smoothness.overrideState = false;
         }
     }
+    void PlayerDamaged()
+    {
+        AudioSource.PlayClipAtPoint(damageSound, transform.position, 1);
+        StartCoroutine(FlashRedTint(0.1f));
+    }
+    IEnumerator FlashRedTint(float duration)
+    {
+        colorAdjustments.active = true;
+        yield return new WaitForSeconds(duration);
+        colorAdjustments.active = false;
+    }
 }
+

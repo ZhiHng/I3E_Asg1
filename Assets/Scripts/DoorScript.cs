@@ -1,6 +1,6 @@
 /*
 * Author: Zhi Hng
-* Date: 9 June 2026
+* Date: 11 June 2026
 * Description: Plays animation
 */
 
@@ -9,6 +9,8 @@ using UnityEngine; // Import Unity-specific classes like MonoBehaviour, GameObje
 
 public class DoorScript : MonoBehaviour
 {
+    [SerializeField]
+    AudioClip doorAudio;
     Animator doorAnimator, batteryAnimator;
     [SerializeField]
     GameObject player;
@@ -31,7 +33,6 @@ public class DoorScript : MonoBehaviour
             {
                 doorAnimator.SetTrigger("doorClose");
                 isOpen = !isOpen;
-                print("close");
             }
         }
     }
@@ -45,6 +46,7 @@ public class DoorScript : MonoBehaviour
         else
         {
             doorAnimator.SetTrigger("doorOpen");
+            AudioSource.PlayClipAtPoint(doorAudio, transform.position, 1);
         }
         isOpen = !isOpen;
     }
