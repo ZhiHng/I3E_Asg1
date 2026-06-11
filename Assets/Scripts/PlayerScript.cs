@@ -114,7 +114,7 @@ public class PlayerScript : MonoBehaviour
                 if ((currentDoor.gameObject.name.Contains("Lvl2") && keycardClearance < 2) || (currentDoor.gameObject.name.Contains("Lvl3") && keycardClearance < 3) || (currentDoor.gameObject.name.Contains("Lvl4") && keycardClearance < 4)) //Checks level for clearance for door
                 {
                     currentDoor = null;
-                    informationUI.BroadcastMessage("Not enough clearance for access");
+                    informationUI.BroadcastMessage("Not enough clearance on your keycard for access");
                 }
                 if (currentDoor.gameObject.name.Contains("Battery") && currentDoor.batteries != 4) //Checks level for clearance for door
                 {

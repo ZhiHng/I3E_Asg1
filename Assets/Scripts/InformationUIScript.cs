@@ -15,11 +15,12 @@ public class InformationUIScript : MonoBehaviour
     TextMeshProUGUI informationUI;
     [SerializeField]
     GameObject player;
+
     void Start()
     {
         informationUI.transform.parent.gameObject.SetActive(false);
     }
-    public void BroadcastMessage(string message)
+    public new void BroadcastMessage(string message)
     {
         StartCoroutine(ShowText(2f, message));
     }
@@ -29,6 +30,52 @@ public class InformationUIScript : MonoBehaviour
         informationUI.transform.parent.gameObject.SetActive(true);
         LayoutRebuilder.ForceRebuildLayoutImmediate(informationUI.rectTransform);
         yield return new WaitForSeconds(duration);
+        informationUI.transform.parent.gameObject.SetActive(false);
+    }
+    void OnTriggerStay(Collider other)
+    {
+        if (other.gameObject.CompareTag("Player"))
+        {
+            print("player");
+            // Find which child collider was triggered
+            Collider[] childColliders = GetComponentsInChildren<Collider>();
+            bool isInTutorialZone = false;
+            foreach (var child in childColliders)
+            {
+                // Check if the player is inside this child collider
+                if (child.bounds.Contains(other.transform.position))
+                {
+                    if (child.gameObject.name.Contains("move"))
+                    {
+                        informationUI.text = "Keys W A S D to move";
+                        informationUI.transform.parent.gameObject.SetActive(true);
+                        LayoutRebuilder.ForceRebuildLayoutImmediate(informationUI.rectTransform);
+                        isInTutorialZone = true;
+                    }
+                    else if (child.gameObject.name.Contains("jump"))
+                    {
+                        informationUI.text = "Space bar to jump";
+                        informationUI.transform.parent.gameObject.SetActive(true);
+                        LayoutRebuilder.ForceRebuildLayoutImmediate(informationUI.rectTransform);
+                        isInTutorialZone = true;
+                    }
+                    else if (child.gameObject.name.Contains("interact"))
+                    {
+                        informationUI.text = "Key E to interact with interactable objects";
+                        informationUI.transform.parent.gameObject.SetActive(true);
+                        LayoutRebuilder.ForceRebuildLayoutImmediate(informationUI.rectTransform);
+                        isInTutorialZone = true;
+                    }
+                }
+                if (!isInTutorialZone)
+                {
+                    informationUI.transform.parent.gameObject.SetActive(false);
+                }
+            }
+        }
+    }
+    void OnTriggerExit(Collider other)
+    {
         informationUI.transform.parent.gameObject.SetActive(false);
     }
 }
