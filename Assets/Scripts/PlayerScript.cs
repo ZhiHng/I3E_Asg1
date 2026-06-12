@@ -145,7 +145,7 @@ public class PlayerScript : MonoBehaviour
         {
             if (damageTimer > 1)
             {
-                hitpoints -= 15;
+                hitpoints -= 10;
                 burnTimer--;
                 damageTimer = 0;
                 hitpointsText.text = "HP: " + hitpoints;
@@ -330,7 +330,7 @@ public class PlayerScript : MonoBehaviour
             {
                 if (damageTimer > 1)
                 {
-                    hitpoints -= 15;
+                    hitpoints -= 10;
                     damageTimer = 0;
                     PlayerDamaged();
                 }
@@ -383,14 +383,14 @@ public class PlayerScript : MonoBehaviour
         colorAdjustments.colorFilter.value = Color.black;
         colorAdjustments.active = true;
         restartButton.SetActive(true);
-        scoreText.GetComponent<TextMeshProUGUI>().text = "Score\n" + score;
+        scoreText.GetComponent<TextMeshProUGUI>().text = "You Passed Out...\nScore\n" + score;
         scoreText.SetActive(true);    
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
     IEnumerator Escaped()
     {
-        int bonusScore = Math.Max(50, Mathf.RoundToInt(300 * Mathf.Exp(-Time.time / 300f))); //max of 300 bonus points if instantly complete level, slower completion will have lower score. Always gets at least 50 points.
+        int bonusScore = Math.Max(50, Mathf.RoundToInt(300 * Mathf.Exp(-Time.time / 500f))); //max of 300 bonus points if instantly complete level, slower completion will have lower score. Always gets at least 50 points.
         score += bonusScore;
         GameObject[] uiInScene = GameObject.FindGameObjectsWithTag("UI");
         foreach (GameObject uiText in uiInScene)

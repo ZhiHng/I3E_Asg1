@@ -1,6 +1,6 @@
 /*
 * Author: Zhi Hng
-* Date: 11 June 2026
+* Date: 12 June 2026
 * Description: Plays animation
 */
 
@@ -53,7 +53,6 @@ public class DoorScript : MonoBehaviour
 
     public void AddBattery(int numberOfBattery)
     {
-        print("adding battery");
         batteries += numberOfBattery;
         batteryAnimator.SetInteger("batteries", batteries);
     }

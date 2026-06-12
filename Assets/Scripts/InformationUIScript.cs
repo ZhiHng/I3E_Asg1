@@ -1,6 +1,6 @@
 /*
 * Author: Zhi hng
-* Date: 11 June 2026
+* Date: 12 June 2026
 * Description: Changes the UI which acts as a tutorial and messages to show "this door is locked" for example.
 */
 
@@ -36,7 +36,6 @@ public class InformationUIScript : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Player"))
         {
-            print("player");
             // Find which child collider was triggered
             Collider[] childColliders = GetComponentsInChildren<Collider>();
             bool isInTutorialZone = false;
@@ -47,7 +46,7 @@ public class InformationUIScript : MonoBehaviour
                 {
                     if (child.gameObject.name.Contains("move"))
                     {
-                        informationUI.text = "Keys W A S D to move";
+                        informationUI.text = "Keys W A S D to move\nShift key to Sprint";
                         informationUI.transform.parent.gameObject.SetActive(true);
                         LayoutRebuilder.ForceRebuildLayoutImmediate(informationUI.rectTransform);
                         isInTutorialZone = true;
