@@ -1,16 +1,15 @@
 /*
 * Author: Zhi hng
-* Date: 11 June 2026
+* Date: 12 June 2026
 * Description: Detects the collectibles in each room and changes UI based on the room the player is in.
 */
 
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CollectibleUIScript : MonoBehaviour
 {
-    int keycard;
-    int battery;
     public TextMeshProUGUI roomCollectibleText;
 
     void Start()
@@ -31,8 +30,12 @@ public class CollectibleUIScript : MonoBehaviour
     }
     void ScanRoom()
     {
-        keycard = 0;
-        battery = 0;
+        int keycard = 0;
+        int battery = 0;
+        int document = 0;
+        int testTubeR = 0;
+        int testTubeG = 0;
+        int testTubeB = 0;
         // Get all colliders on this room object
         Collider[] roomColliders = gameObject.GetComponents<Collider>();
 
@@ -46,9 +49,43 @@ public class CollectibleUIScript : MonoBehaviour
                 {
                     if (hit.name.Contains("keycard")) keycard++;
                     if (hit.name.Contains("battery")) battery++;
+                    if (hit.name.Contains("folder")) document++;
+                    if (hit.name.Contains("testtubeRed")) testTubeR++;
+                    if (hit.name.Contains("testtubeBlue")) testTubeB++;
+                    if (hit.name.Contains("testtubeGreen")) testTubeG++;
                 }
             }
         }
-        roomCollectibleText.text = "Keycards: " + keycard + "\nBattery: " + battery;
+        string text = "";
+        if (keycard != 0)
+        {
+            text += "Keycards: " + keycard + "\n";
+        }
+        if (battery != 0)
+        {
+            text += "Battery: " + battery + "\n";
+        }
+        if (document != 0)
+        {
+            text += "Documents: " + document + "\n";
+        }
+        if (testTubeR != 0)
+        {
+            text += "Test tube R: " + testTubeR + "\n";
+        }
+        if (testTubeG != 0)
+        {
+            text += "Test tube G: " + testTubeG + "\n";
+        }
+        if (testTubeB != 0)
+        {
+            text += "Test tube B: " + testTubeB + "\n";
+        }
+        roomCollectibleText.text = text.TrimEnd('\n');
+        LayoutRebuilder.ForceRebuildLayoutImmediate(roomCollectibleText.rectTransform);
+        if (text.Length == 0)
+        {
+            roomCollectibleText.transform.parent.gameObject.SetActive(false);
+        }
     }
 }

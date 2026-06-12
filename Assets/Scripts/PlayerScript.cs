@@ -1,6 +1,6 @@
 /*
 * Author: Zhi Hng
-* Date: 11 June 2026
+* Date: 12 June 2026
 * Description: Handles interactions of collectibles, doors
 */
 
@@ -13,6 +13,7 @@ using System.Collections;
 
 public class PlayerScript : MonoBehaviour
 {
+    int score = 0;
     [SerializeField]
     InformationUIScript informationUI;
     CollectibleScript currentCollectible; // Store the collectible object the player is currently able to interact with
@@ -30,8 +31,8 @@ public class PlayerScript : MonoBehaviour
     [SerializeField]
     AudioClip damageSound;
 
-    int documentCount = 0; // Keep track of how many documents the player has collected so far
-    int totalDocument;
+    int documentCount, testTubeRCount, testTubeGCount, testTubeBCount = 0; // Keep track of how many documents the player has collected so far
+    int totalDocument, totalTestTubeR, totalTestTubeG, totalTestTubeB;
     [SerializeField]
     int batteryCount = 0;
     [SerializeField]
@@ -44,6 +45,11 @@ public class PlayerScript : MonoBehaviour
     [SerializeField]
     TextMeshProUGUI collectibleText, hitpointsText; // Reference to the UI text element that displays the player's score
     CharacterController controller;
+    bool isDead, isDeadAnimation, isEscape = false;
+    [SerializeField]
+    GameObject restartButton, scoreText;
+    [SerializeField]
+    GameObject liftCheckZone;
     
     void Start()
     {
@@ -61,29 +67,76 @@ public class PlayerScript : MonoBehaviour
             {
                 totalDocument++;
             }
+            else if (item.name.Contains("testtubeRed"))
+            {
+                totalTestTubeR++;
+            }
+            else if (item.name.Contains("testtubeGreen"))
+            {
+                totalTestTubeG++;
+            }
+            else if (item.name.Contains("testtubeBlue"))
+            {
+                totalTestTubeB++;
+            }
         }
-        collectibleText.text = "Documents: " + documentCount + " / " + totalDocument + "\nBatteries: " + batteryCount;
+        collectibleText.text = "Documents: " + documentCount + " / " + totalDocument + 
+                                "\nTest Tube R: " + testTubeRCount + " / " + totalTestTubeR +
+                                "\nTest Tube G: " + testTubeGCount + " / " + totalTestTubeG +
+                                "\nTest Tube B: " + testTubeBCount + " / " + totalTestTubeB +
+                                "\nBatteries: " + batteryCount;
     }
     void Update()
     {
+        if (isDead)
+        {   
+            if (!isDeadAnimation)
+            {
+                GetComponent<CharacterController>().enabled = false;
+                isDeadAnimation = true;
+                StartCoroutine(DeadVision());
+            }
+        }
+        if (isEscape)
+        {
+            if (!isDeadAnimation)
+            {
+                GetComponent<CharacterController>().enabled = false;
+                isDeadAnimation = true;
+                StartCoroutine(Escaped());
+            }
+        }
         if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out RaycastHit hit, 1.5f, highlightable)) {
             GameObject target = hit.collider.gameObject;
 
             if (currentHighlighted != target) {
+                
                 // Remove highlight from old
                 if (currentHighlighted != null) {
-                    currentHighlighted.GetComponent<Renderer>().material = originalMaterial;
+                    Renderer[] childrenRenderer = currentHighlighted.GetComponentsInChildren<Renderer>();
+                    foreach (Renderer child in childrenRenderer)
+                    {
+                        child.material = originalMaterial;
+                    }
                 }
 
                 // Apply highlight to new
                 currentHighlighted = target;
-                originalMaterial = currentHighlighted.GetComponent<Renderer>().material;
-                currentHighlighted.GetComponent<Renderer>().material = highlightMaterial;
+                originalMaterial = currentHighlighted.GetComponentInChildren<Renderer>().material;
+                Renderer[] childrenRenderers = currentHighlighted.GetComponentsInChildren<Renderer>();
+                foreach (Renderer child in childrenRenderers)
+                    {
+                        child.material = highlightMaterial;
+                    }
             }
         } else {
             // No hit, remove highlight
             if (currentHighlighted != null) {
-                currentHighlighted.GetComponent<Renderer>().material = originalMaterial;
+                Renderer[] childrenRenderer = currentHighlighted.GetComponentsInChildren<Renderer>();
+                foreach (Renderer child in childrenRenderer)
+                    {
+                        child.material = originalMaterial;
+                    }
                 currentHighlighted = null;
             }
         }
@@ -104,6 +157,11 @@ public class PlayerScript : MonoBehaviour
                 isBurn = false;
             }
         }
+
+        if (hitpoints <= 0)
+        {
+            isDead = true;
+        }
     }
     void OnInteract() // Custom interaction method called when the player performs an interact action
     {
@@ -120,6 +178,16 @@ public class PlayerScript : MonoBehaviour
                 {
                     currentDoor = null;
                     informationUI.BroadcastMessage("Not enough batteries to power the door");
+                }
+            }
+            if (hit.collider.gameObject.CompareTag("LiftButton"))
+            {
+                if (liftCheckZone.GetComponent<Collider>().bounds.Contains(gameObject.transform.position))
+                {
+                    Animator liftAnimator = hit.collider.transform.parent.gameObject.GetComponent<Animator>();
+                    gameObject.transform.SetParent(liftAnimator.transform);
+                    liftAnimator.SetBool("startLift", true);
+                    isEscape = true;
                 }
             }
             if(hit.collider.gameObject.CompareTag("PowerUnit")) 
@@ -139,7 +207,11 @@ public class PlayerScript : MonoBehaviour
                     batteryCount = batteryCount - addedBattery;
                     currentDoor.AddBattery(addedBattery);
                     
-                    collectibleText.text = "Documents: " + documentCount + " / " + totalDocument + "\nBatteries: " + batteryCount;
+                    collectibleText.text = "Documents: " + documentCount + " / " + totalDocument + 
+                                "\nTest Tube R: " + testTubeRCount + " / " + totalTestTubeR +
+                                "\nTest Tube G: " + testTubeGCount + " / " + totalTestTubeG +
+                                "\nTest Tube B: " + testTubeBCount + " / " + totalTestTubeB +
+                                "\nBatteries: " + batteryCount;
                 }
                 currentDoor = null;
             }
@@ -170,7 +242,28 @@ public class PlayerScript : MonoBehaviour
             {
                 batteryCount++;
             }
-            collectibleText.text = "Documents: " + documentCount + " / " + totalDocument + "\nBatteries: " + batteryCount; // Update the on-screen score display to reflect the new score after collecting an item
+            else if (currentCollectible.gameObject.name.Contains("folder"))
+            {
+                documentCount++;
+            }
+            else if (currentCollectible.gameObject.name.Contains("testtubeRed"))
+            {
+                testTubeRCount++;
+            }
+            else if (currentCollectible.gameObject.name.Contains("testtubeGreen"))
+            {
+                testTubeGCount++;
+            }
+            else if (currentCollectible.gameObject.name.Contains("testtubeBlue"))
+            {
+                testTubeBCount++;
+            }
+            score += currentCollectible.collectibleScore;
+            collectibleText.text = "Documents: " + documentCount + " / " + totalDocument + 
+                                "\nTest Tube R: " + testTubeRCount + " / " + totalTestTubeR +
+                                "\nTest Tube G: " + testTubeGCount + " / " + totalTestTubeG +
+                                "\nTest Tube B: " + testTubeBCount + " / " + totalTestTubeB +
+                                "\nBatteries: " + batteryCount;
             hitpointsText.text = "HP: " + hitpoints;
             currentCollectible.Collect(); // Call the Collect method on the collectible script to handle its collection logic
             currentCollectible = null; // Clear the reference so the player no longer has an active collectible selected 
@@ -272,6 +365,51 @@ public class PlayerScript : MonoBehaviour
         colorAdjustments.active = true;
         yield return new WaitForSeconds(duration);
         colorAdjustments.active = false;
+    }
+    IEnumerator DeadVision()
+    {
+        GameObject[] uiInScene = GameObject.FindGameObjectsWithTag("UI");
+        foreach (GameObject uiText in uiInScene)
+        {
+            uiText.SetActive(false);
+        }
+        float tick = 0f;
+        while (tick < 1f)
+        {
+            tick += Time.deltaTime / 2f; // 2 seconds duration
+            vignette.intensity.value = Mathf.Lerp(0.2f, 1f, tick); // gradually darken
+            yield return null;
+        }
+        colorAdjustments.colorFilter.value = Color.black;
+        colorAdjustments.active = true;
+        restartButton.SetActive(true);
+        scoreText.GetComponent<TextMeshProUGUI>().text = "Score\n" + score;
+        scoreText.SetActive(true);    
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
+    IEnumerator Escaped()
+    {
+        int bonusScore = Math.Max(50, Mathf.RoundToInt(300 * Mathf.Exp(-Time.time / 300f))); //max of 300 bonus points if instantly complete level, slower completion will have lower score. Always gets at least 50 points.
+        score += bonusScore;
+        GameObject[] uiInScene = GameObject.FindGameObjectsWithTag("UI");
+        foreach (GameObject uiText in uiInScene)
+        {
+            uiText.SetActive(false);
+        }
+        float tick = 0f;
+        colorAdjustments.active = true;
+        while (tick < 1f)
+        {
+            tick += Time.deltaTime / 8f; // 2 seconds duration
+            colorAdjustments.colorFilter.value = Color.Lerp(Color.white, Color.black, tick); // gradually darken
+            yield return null;
+        }
+        restartButton.SetActive(true);
+        scoreText.GetComponent<TextMeshProUGUI>().text = "Successfully Escaped!\nScore\n" + score;
+        scoreText.SetActive(true);    
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 }
 
