@@ -62,12 +62,14 @@ The other collectibles are scattered all over the level and upon entering each r
 
 ## Limitations and Bugs
 - Pushing multiple medkits at the medkit platform will cause them to instead of displaying the highlight when looking at them, hide them from the view of the player.
+- Pushing the box at the medkit platform will also sometimes have the same bug as the medkit pushing.
 - Closing doors while standing in the middle of the door frame will cause it to crush you and make you unable to move or open the door again.
 - Sometimes doors will not open. This bug is rarely encountered but when the game is reloaded, it should be fine.
 - Clipping of game camera into walls to see outside the level. Not that much but it breaks the immersion.
 - Certain areas in the level will have the player unable to jump or have a shorter jump height. This is due to mesh colliders being less accurate. Box colliders have been added to important areas which needs jumping.
 - Jumping on stairs in the final room only works if standing at the edge of the stairs. Due to mesh collider again.
 - In the room below the level with many beds, jumping while close to the ceiling will cause the player to float until the ground is far away or the roof is open. (Does not affect gameplay much)
+- The first dark room uses a mesh collider set to convex and is trigger, however, due to the shape of the room, convex will cause it to have the trigger zone to be outside the door of the lvl 3 door. This can be solved by using 2 box colliders and using bounds but is a lot more code for it to work on one area only since it is the only dark room with an odd shape. (Does not really affect gameplay unless player stands in the corner of the door entrance)
 
 ## Credits
 - Larson, A. (n.d.). *Gidole*. Google Fonts. [https://fonts.google.com/specimen/Gidole](https://fonts.google.com/specimen/Gidole).
