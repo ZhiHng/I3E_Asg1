@@ -1,6 +1,6 @@
 /*
 * Author: Zhi hng
-* Date: 12 June 2026
+* Date: 13 June 2026
 * Description: Changes the UI which acts as a tutorial and messages to show "this door is locked" for example.
 */
 
@@ -11,26 +11,42 @@ using UnityEngine.UI;
 
 public class InformationUIScript : MonoBehaviour
 {
+    /// <summary>
+    /// Reference the TextMeshProUGUI used to show the helpful information
+    /// </summary>
     [SerializeField]
     TextMeshProUGUI informationUI;
+    /// <summary>
+    /// Reference the player gameobject which has the PlayerScript
+    /// </summary>
     [SerializeField]
     GameObject player;
 
     void Start()
     {
-        informationUI.transform.parent.gameObject.SetActive(false);
+        informationUI.transform.parent.gameObject.SetActive(false); //disables the information TextMeshProUGUI to hide from the player's view
     }
+    /// <summary>
+    /// Enables the UI to show a particular message
+    /// </summary>
+    /// <param name="message">Message to be shown</param>
     public new void BroadcastMessage(string message)
     {
         StartCoroutine(ShowText(2f, message));
     }
+    /// <summary>
+    /// Enables the TextMeshProUGUI for a duration to show a message and disables it again
+    /// </summary>
+    /// <param name="duration">Duration for the message to stay on the screen</param>
+    /// <param name="message">Message to be shown</param>
+    /// <returns></returns>
     IEnumerator ShowText(float duration, string message)
     {
         informationUI.text = message;
-        informationUI.transform.parent.gameObject.SetActive(true);
-        LayoutRebuilder.ForceRebuildLayoutImmediate(informationUI.rectTransform);
+        informationUI.transform.parent.gameObject.SetActive(true); // Show the text
+        LayoutRebuilder.ForceRebuildLayoutImmediate(informationUI.rectTransform); // Forces Unity to redraw the black background behind the text
         yield return new WaitForSeconds(duration);
-        informationUI.transform.parent.gameObject.SetActive(false);
+        informationUI.transform.parent.gameObject.SetActive(false); //Hide the text
     }
     void OnTriggerStay(Collider other)
     {
@@ -66,7 +82,7 @@ public class InformationUIScript : MonoBehaviour
                         isInTutorialZone = true;
                     }
                 }
-                if (!isInTutorialZone)
+                if (!isInTutorialZone) // Ensures that if the player is not in all 3 collider's bounds, the text UI will hide
                 {
                     informationUI.transform.parent.gameObject.SetActive(false);
                 }

@@ -1,6 +1,6 @@
 /*
 * Author: Zhi hng
-* Date: 10 June 2026
+* Date: 13 June 2026
 * Description: Plays collect audio and deletes collectible
 */
 
@@ -8,23 +8,25 @@ using UnityEngine;
 
 public class CollectibleScript : MonoBehaviour
 {
+    /// <summary>
+    /// Score that this collectible will provide to the player
+    /// </summary>
     public int collectibleScore = 0; // Store the score value of this collectible, editable from the Unity Inspector. (this allows different collectibles to be worth different amounts of points)
+    /// <summary>
+    /// Volume of the audio which this collectible will play when collected
+    /// </summary>
     [SerializeField]
     float volume;
+    /// <summary>
+    /// Audio that this collectible will play when collected
+    /// </summary>
     [SerializeField]
     AudioClip collectibleAudioClip;
-
-    public void Collect() // Custom method to handle the collection of this item, called from the PlayerScript when the player interacts with it
+    /// <summary>
+    /// Plays the audio linked to the collectible and deletes the collectible
+    /// </summary>
+    public void Collect()
     {
-        // if(collectibleAudio != null) // Check if the AudioSource component exists before trying to play a sound
-        // {
-        //     collectibleAudio.Play(); // Play the collection sound effect to provide feedback to the player
-        // }
-        // SOLUTION 1
-        //Destroy(gameObject, collectibleAudio.clip.length); // Destroy this GameObject after the sound has finished playing to remove it from the scene
-
-        
-        // SOLUTION 2
         AudioSource.PlayClipAtPoint(collectibleAudioClip, transform.position, volume);
         Destroy(gameObject); // Immediately destroy this GameObject to remove it from the scene, allowing the sound to play independently
     }
