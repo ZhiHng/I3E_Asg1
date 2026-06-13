@@ -1,5 +1,5 @@
 # Escaping an Abandoned Research Facility
-You have awoken in an unknown place, having no memory of the past. You explore the underground facillity to try to find a way out. However, you notice some unusual things happening around the facility - objects are enlarged. You salvage as much important research documents and specimens and escape as fast as possible to hopdfully sell them for money. Will you escape this uncertain place or will you fall along with it?
+You have awoken in an unknown place, having no memory of the past. You explore the underground facility to try to find a way out. However, you notice some unusual things happening around the facility - objects are enlarged. You salvage as much important research documents and specimens and escape as fast as possible to hopefully sell them for money. Will you escape this uncertain place, or will you fall along with it?
 
 ## General Information
 ### Game Controls
@@ -26,20 +26,20 @@ You have awoken in an unknown place, having no memory of the past. You explore t
 ### Hazards
 - Green Substance - Deals 5 damage every 0.1 seconds.
 - Red Substance - Deals 10 damage every 1 second, after leaving the red substance, continues to deal 10 damage every 1 second for 3 times.
-- Laser - Deals 2 damage and knocks back the player. Continuously running into in to force walking through the laser will deplete HP very fast.
+- Laser - Deals 2 damage and knocks back the player. Continuously running into it to force walking through the laser will deplete HP very fast.
 
 ## Location of Collectibles
 ### Key Collectibles
 - After clearing the first jumping obstacle, the room on the right and after jumping through the hole in the wall has **1 keycard** (Behind the experiment pods)
-- The room at the right of the long hallway contains **1 keycard** and **1 battery**. (Under a table and Beside a table)
+- The room at the right of the long hallway contains **1 keycard** and **1 battery**. (Under a table and beside a table)
 - The room at the left of the long hallway contains **1 battery**. Proceed deeper to reach the laser room with **1 battery**. (At the entrance of the door and behind the terminal of the laser room)
 
 After powering the battery door...
-    - On the top right of the room has **1 battery**. (Parkour on the experiment pods in the green substance and jump over the long platform at the second battery powered door)
-    - The tables in front of the reactor has **1 keycard**. (Beside a chair)
-    - The room on the right of the entrance has **1 battery**. (On the second floor at the stairs area behind a table)
-    - On the right side of the room at the red substance, there is a plaform with **1 battery**.
-    At the second battery powered door at the fart side of the entrance has **1 battery**. (On the floor)
+- On the top right of the room has **1 battery**. (Parkour on the experiment pods in the green substance and jump over the long platform at the second battery powered door)
+- The tables in front of the reactor have **1 keycard**. (Beside a chair)
+- The room on the right of the entrance has **1 battery**. (On the second floor at the stairs area behind a table)
+- On the right side of the room at the red substance, there is a platform with **1 battery**.
+- At the second battery powered door at the far side of the entrance has **1 battery**. (On the floor)
 
 ### Other Collectibles
 The other collectibles are scattered all over the level and upon entering each room, if there is a collectible, the user interface will state how many there are.
@@ -54,7 +54,7 @@ The other collectibles are scattered all over the level and upon entering each r
 1. Collect batteries for the first battery powered door but do not power the first door. Instead head to the laser room and parkour to the top platform. 
 2. Push the white box down the stairs to easily get back up if you drop down.
 3. Head to the second battery powered door and pick up the battery on the floor and instantly unlock the door without unlocking the first door and finding extra batteries.
-4. Level completion speed plays a part in final score. A minumum of 50 and maximum of 300 bonus points if players escape successfully. Dying will not give bonus points.
+4. Level completion speed plays a part in final score. A minimum of 50 and maximum of 300 bonus points if players escape successfully. Dying will not give bonus points.
 
 ## Device Specifications
 - Minimum: Windows 10, Intel i3, 4 GB RAM, integrated graphics.
@@ -69,7 +69,7 @@ The other collectibles are scattered all over the level and upon entering each r
 - Certain areas in the level will have the player unable to jump or have a shorter jump height. This is due to mesh colliders being less accurate. Box colliders have been added to important areas which needs jumping.
 - Jumping on stairs in the final room only works if standing at the edge of the stairs. Due to mesh collider again.
 - In the room below the level with many beds, jumping while close to the ceiling will cause the player to float until the ground is far away or the roof is open. (Does not affect gameplay much)
-- The first dark room uses a mesh collider set to convex and is trigger, however, due to the shape of the room, convex will cause it to have the trigger zone to be outside the door of the lvl 3 door. This can be solved by using 2 box colliders and using bounds but is a lot more code for it to work on one area only since it is the only dark room with an odd shape. (Does not really affect gameplay unless player stands in the corner of the door entrance)
+- The first dark room uses a mesh collider set to convex and is trigger, however, due to the shape of the room, convex will cause it to have the trigger zone to be outside the door of the level 3 clearance door. This can be solved by using 2 box colliders and using bounds but is a lot more code for it to work on one area only since it is the only dark room with an odd shape. (Does not really affect gameplay unless player stands in the corner of the door entrance)
 
 ## Credits
 - Larson, A. (n.d.). *Gidole*. Google Fonts. [https://fonts.google.com/specimen/Gidole](https://fonts.google.com/specimen/Gidole).
